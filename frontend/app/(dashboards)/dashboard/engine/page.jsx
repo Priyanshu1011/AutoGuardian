@@ -1,13 +1,51 @@
 "use client";
+
+import axios from "axios";
+import { useState, useEffect } from "react";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
 import NavBar from "@/components/NavBar";
 import { useUser } from "@auth0/nextjs-auth0/client";
-import Link from "next/link";
 
 const Engine = () => {
+  const secondsIncrement = 5;
+  const [data, setData] = useState([]);
+  const [count, setCount] = useState(0);
+  const [isEngineMaintenanceNeeded, setIsEngineMaintenanceNeeded] =
+    useState(false);
   const { user, error, isLoading } = useUser();
+
+  const handleSimulateData = async () => {
+    try {
+      const response = await axios.post("/api/simulate");
+      setData((prevData) => [
+        ...prevData,
+        { name: `t=${count}s`, ...response.data },
+      ]);
+      // setData((prevData) => [...prevData, response.data.data]);
+      setCount((count) => count + secondsIncrement);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  // Simulate data generation every second
+  useEffect(() => {
+    const interval = setInterval(handleSimulateData, secondsIncrement*1000);
+    return () => clearInterval(interval);
+  }, [count]);
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>{error.message}</div>;
+
   if (!user) {
     return (
       <div>
@@ -18,6 +56,7 @@ const Engine = () => {
       </div>
     );
   }
+
   return (
     <div>
       <NavBar />
@@ -28,18 +67,38 @@ const Engine = () => {
             Get to know your vehicle's engine health in real-time
           </h2>
         </section>
-        <p className="text-md">
-          Here is a list of vehicle metrics you can analyze.
-        </p>
-        <ul>
-          <li>
-            <Link href="/dashboard/engine" legacyBehavior>
-              <button className="bg-white text-blue-600 py-2 px-4 rounded mr-4">
-                Engine
-              </button>
-            </Link>
-          </li>
-        </ul>
+        <section>
+          {isEngineMaintenanceNeeded ? (
+            <div className="flex items-center justify-center text-red-500">
+              Engine Maintenance Needed!
+            </div>
+          ) : (
+            <div className="flex items-center justify-center text-green-600">
+              Engine Maintenance NOT Needed
+            </div>
+          )}
+        </section>
+        {/* Displaying the charts of engine metrics v/s Time */}
+        <ResponsiveContainer width="100%" height={400}>
+          <LineChart data={data}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="name" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            <Line type="monotone" dataKey="engine_rpm" stroke="#8884d8" />
+            <Line type="monotone" dataKey="lub_oil_pressure" stroke="#82ca9d" />
+            <Line type="monotone" dataKey="fuel_pressure" stroke="#ff7300" />
+            <Line type="monotone" dataKey="coolant_pressure" stroke="#387908" />
+            <Line type="monotone" dataKey="lub_oil_temp" stroke="#fc5a03" />
+            <Line type="monotone" dataKey="coolant_temp" stroke="#8884d8" />
+            <Line
+              type="monotone"
+              dataKey="temperature_difference"
+              stroke="#d8bf39"
+            />
+          </LineChart>
+        </ResponsiveContainer>
       </section>
     </div>
   );

@@ -8,7 +8,12 @@ const NavBar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { user, error, isLoading } = useUser();
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading)
+    return (
+      <div className="text-sm text-orange-500 font-semibold flex items-center">
+        Navbar Loading...
+      </div>
+    );
   if (error) return <div>{error.message}</div>;
 
   const toggleMenu = () => {
