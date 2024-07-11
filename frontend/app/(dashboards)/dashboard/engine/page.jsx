@@ -73,7 +73,7 @@ const Engine = () => {
         <section className="flex flex-col gap-y-2 mb-4 md:mb-6 lg:mb-10">
           <h1 className="text-3xl font-bold text-primary-color">Engine</h1>
           <h2 className="text-2xl font-semibold">
-            Get to know your vehicle's engine health in real-time
+            Get to know your vehicles engine health in real-time
           </h2>
         </section>
         <section>
