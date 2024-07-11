@@ -30,6 +30,15 @@ const Engine = () => {
         ...prevData,
         { name: `t=${count}s`, ...response.data },
       ]);
+      console.log(data[data.length-1]);
+      
+
+      if (data[data.length - 1]["prediction"] == 1) {
+        setIsEngineMaintenanceNeeded(true);
+      }
+      else {
+        setIsEngineMaintenanceNeeded(false);
+      }
       // setData((prevData) => [...prevData, response.data.data]);
       setCount((count) => count + secondsIncrement);
     } catch (error) {
