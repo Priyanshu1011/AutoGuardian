@@ -2,4 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-
+.text-primary-color {
+    color: #2563ea;
+}
